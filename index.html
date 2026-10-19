@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#064e3b"><link rel="manifest" href="manifest.json">
+<title>Deen+ — Coran complet</title>
+<style>
+:root{--gold:#e4c46a;--bg:#071c17;--panel:#102b23;--text:#f7f4e8;--muted:#e0e9e4}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#071c17,#0d3025);color:var(--text);font:16px system-ui,sans-serif}
+header{text-align:center;padding:20px 14px}h1,h2{color:var(--gold)}h1{margin:0;font-size:32px}header p{color:var(--muted);margin:4px}
+nav{display:flex;gap:5px;overflow:auto;position:sticky;top:0;background:#071c17;padding:8px;z-index:2}
+nav button{flex:1;min-width:65px;padding:10px 7px;border-radius:10px;border:1px solid #507461;background:#102b23;color:white}
+nav button.active{background:var(--gold);color:#10251c;font-weight:bold}
+main{max-width:760px;margin:auto;padding:10px}.page{display:none}.page.active{display:block}
+/* Contraste renforcé : aucun texte vert foncé sur panneau vert foncé */
+.card, .card p, .card b, .card label, .card span, .card li {color:var(--text)}
+.card h2, .card .big, .card .arabic, .card .meta {color:var(--gold)}
+.card .muted, .card small {color:#e0e9e4}
+.card button.secondary {color:#ffffff}
+.card a {color:#ffdc79}
+.card{background:var(--panel);border:1px solid #315848;border-radius:16px;padding:15px;margin:10px 0}
+.big{font-size:28px;color:var(--gold);font-weight:750}.muted,small{color:var(--muted)}
+button{cursor:pointer}.action{background:var(--gold);color:#14271e;border:0;border-radius:10px;padding:10px 13px;font-weight:700}
+.secondary{background:#174432;color:white;border:1px solid #507461;border-radius:10px;padding:9px 12px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #315848}
+input[type=search],select{width:100%;padding:12px;background:#071c17;color:white;border:1px solid #507461;border-radius:10px;margin:7px 0}
+.surahItem{padding:12px 5px;border-bottom:1px solid #315848;cursor:pointer}.surahItem:hover{background:#174432}
+.ayah{padding:14px 4px;border-bottom:1px solid #315848}.arabic{font-size:25px;line-height:1.9;text-align:right;direction:rtl;color:#fff4c8}.translation{line-height:1.7;color:#dce8df;margin-top:8px}.meta{color:var(--gold);font-size:13px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
+</style></head><body>
+<header><h1>☾ Deen+</h1><p>Ton compagnon spirituel au quotidien</p></header>
+<nav><button class="active" data-page="home">Accueil</button><button data-page="prayers">Prières</button><button data-page="dhikr">Dhikr</button><button data-page="quran">Coran</button><button data-page="premium">Premium</button></nav>
+<main>
+<section id="home" class="page active">
+<div class="card"><small>ASSALAMOU ALAYKOUM</small><h2>Bienvenue sur Deen+</h2><p>Un espace simple pour organiser tes prières, tes rappels et ta lecture du Coran.</p><p class="muted">Horaires de démonstration — vérifie les horaires locaux.</p><div class="big">Maghrib — 19:00</div><p id="today"></p></div>
+<div class="card"><h2>Aujourd’hui</h2><div id="progress">Prières cochées : 0/5</div><p><button class="action" onclick="showPage('prayers')">Mes prières</button> <button class="secondary" onclick="showPage('dhikr')">Faire du dhikr</button> <button class="secondary" onclick="showPage('quran')">Lire le Coran</button></p></div>
+</section>
+<section id="prayers" class="page"><div class="card"><h2>Prières quotidiennes</h2><p class="muted">Horaires fixes de démonstration pour Perpignan : ils ne s’actualisent pas automatiquement. Vérifie les horaires locaux fiables.</p><div id="prayerList"></div><button class="secondary" onclick="resetPrayers()">Réinitialiser les coches</button></div></section>
+<section id="dhikr" class="page"><div class="card"><h2>Compteur de dhikr</h2><div class="big" id="count">0</div><p>Objectif : <span id="goal">33</span></p><button class="secondary" onclick="setGoal(10)">10</button> <button class="secondary" onclick="setGoal(33)">33</button> <button class="secondary" onclick="setGoal(100)">100</button><p><button class="action" onclick="changeCount(1)">+1</button> <button class="secondary" onclick="changeCount(-1)">−1</button> <button class="secondary" onclick="resetCount()">Remettre à zéro</button></p><p id="goalMessage" class="muted"></p></div>
+<div class="card"><h2>Quelques rappels</h2><p class="arabic">سُبْحَانَ اللَّهِ</p><b>SubhanAllah</b><p>Gloire à Allah.</p><p class="arabic">الْحَمْدُ لِلَّهِ</p><b>Alhamdulillah</b><p>Louange à Allah.</p><p class="arabic">اللَّهُ أَكْبَرُ</p><b>Allahu Akbar</b><p>Allah est le plus grand.</p></div></section>
+<section id="quran" class="page"><div class="card"><h2>Coran complet</h2><p class="muted">114 sourates • texte arabe et traduction française chargés depuis un service en ligne. Une connexion Internet est nécessaire.</p><input id="surahSearch" type="search" placeholder="Rechercher une sourate…" oninput="renderSurahList()"><div id="surahList">Chargement de la liste des sourates…</div><div id="reader" style="display:none"><div class="row"><button class="secondary" onclick="navigateSurah(-1)">← Précédente</button><button class="secondary" onclick="navigateSurah(1)">Suivante →</button></div><h3 id="readerTitle"></h3><div id="ayahs"></div><div class="row"><button class="secondary" onclick="navigateSurah(-1)">← Précédente</button><button class="secondary" onclick="navigateSurah(1)">Suivante →</button></div></div><p id="quranStatus" class="muted"></p><p class="muted">Pour un usage religieux, vérifie la traduction et les références auprès d’une source de confiance. La traduction est une interprétation du sens, distincte du texte arabe.</p></div></section>
+<section id="premium" class="page"><div class="card"><h2>Deen+ Premium</h2><div class="big">2,99 € / mois</div><p>Maquette d’une future offre : thèmes supplémentaires, statistiques et options avancées.</p><p class="muted">Aucun paiement n’est activé dans cette version.</p><button class="secondary" onclick="alert('Ceci est une maquette. Aucun paiement ne sera effectué.')">Découvrir</button></div></section>
+</main><footer>Deen+ • Version de démonstration</footer>
+<script>
+const prayerTimes=[["Fajr","07:05"],["Lever du soleil","08:06"],["Dohr","13:33"],["Asr","16:32"],["Maghrib","19:00"],["Isha","20:01"]];
+const checked=new Set();let count=0,goal=33,chapters=[],currentSurah=1;
+function showPage(id){document.querySelectorAll('.page').forEach(e=>e.classList.toggle('active',e.id===id));document.querySelectorAll('nav button').forEach(e=>e.classList.toggle('active',e.dataset.page===id));if(id==='quran'&&chapters.length===0)loadChapters()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+function renderPrayers(){document.getElementById('prayerList').innerHTML=prayerTimes.map((p,i)=>`<div class="row"><span><b>${p[0]}</b><br><small>${p[1]}</small></span><label><input type="checkbox" ${checked.has(i)?'checked':''} onchange="togglePrayer(${i},this.checked)"> Effectuée</label></div>`).join('');updateProgress()}
+function togglePrayer(i,v){v?checked.add(i):checked.delete(i);updateProgress()}function updateProgress(){document.getElementById('progress').textContent='Prières cochées : '+[0,1,2,3,4].filter(i=>checked.has(i)).length+'/5'}function resetPrayers(){checked.clear();renderPrayers()}
+function changeCount(n){count=Math.max(0,count+n);updateCount()}function resetCount(){count=0;updateCount()}function setGoal(n){goal=n;document.getElementById('goal').textContent=n;updateCount()}function updateCount(){document.getElementById('count').textContent=count;document.getElementById('goalMessage').textContent=count>=goal?'Objectif atteint !':(goal-count)+' répétition(s) restante(s).'}
+async function loadChapters(){const s=document.getElementById('quranStatus');s.textContent='Chargement des 114 sourates…';try{let r=await fetch('https://api.alquran.cloud/v1/surah');if(!r.ok)throw new Error('Service indisponible');let j=await r.json();if(j.code!==200)throw new Error('Réponse invalide');chapters=j.data;renderSurahList();s.textContent='Liste chargée. Sélectionne une sourate.'}catch(e){s.textContent='Impossible de charger la liste. Vérifie Internet puis réessaie.';document.getElementById('surahList').innerHTML='<button class="action" onclick="loadChapters()">Réessayer</button> <a style="color:#e4c46a" href="https://quran.com/fr" target="_blank" rel="noopener">Lire sur Quran.com</a>'}}
+function renderSurahList(){const q=(document.getElementById('surahSearch').value||'').toLowerCase();document.getElementById('surahList').innerHTML=chapters.filter(c=>String(c.number).includes(q)||c.englishName.toLowerCase().includes(q)||c.name.includes(q)||c.englishNameTranslation.toLowerCase().includes(q)).map(c=>`<div class="surahItem" onclick="openSurah(${c.number})"><b>${c.number}. ${c.englishName}</b> <span class="arabic" style="font-size:20px">${c.name}</span><br><small>${c.englishNameTranslation} • ${c.numberOfAyahs} versets</small></div>`).join('')}
+async function openSurah(n){currentSurah=n;document.getElementById('surahList').style.display='none';document.getElementById('reader').style.display='block';document.getElementById('readerTitle').textContent='Chargement de la sourate '+n+'…';document.getElementById('ayahs').innerHTML='';document.getElementById('quranStatus').textContent='Chargement du texte arabe et de la traduction française…';try{const urls=[`https://api.alquran.cloud/v1/surah/${n}/editions/quran-uthmani,fr.hamidullah`];const r=await fetch(urls[0]);if(!r.ok)throw new Error('Service indisponible');const j=await r.json();if(j.code!==200||!j.data||j.data.length<2)throw new Error('Données indisponibles');const ar=j.data[0],fr=j.data[1];document.getElementById('readerTitle').textContent=`${ar.number}. ${ar.englishName} — ${ar.name} (${ar.numberOfAyahs} versets)`;document.getElementById('ayahs').innerHTML=ar.ayahs.map((a,i)=>`<div class="ayah"><div class="meta">${ar.number}:${a.numberInSurah}</div><div class="arabic" lang="ar">${a.text}</div><div class="translation">${fr.ayahs[i]?fr.ayahs[i].text:'Traduction indisponible.'}</div></div>`).join('');document.getElementById('quranStatus').textContent='Sourate chargée.';document.getElementById('reader').scrollIntoView({behavior:'smooth',block:'start'})}catch(e){document.getElementById('readerTitle').textContent='Chargement impossible';document.getElementById('ayahs').innerHTML='<p>Vérifie ta connexion Internet puis réessaie.</p><button class="action" onclick="openSurah('+n+')">Réessayer</button> <a style="color:#e4c46a" href="https://quran.com/fr" target="_blank" rel="noopener">Ouvrir Quran.com</a>';document.getElementById('quranStatus').textContent='Le texte complet n’a pas pu être chargé.'}}
+function navigateSurah(d){const n=Math.max(1,Math.min(114,currentSurah+d));openSurah(n)}
+document.getElementById('today').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});renderPrayers();
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script></body></html>
